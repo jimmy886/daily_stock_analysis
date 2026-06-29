@@ -35,7 +35,7 @@ jobs:
     runs-on: ubuntu-latest
     # 已删除非法 environment: STOCK_LIST 配置
     # 修复语法报错，替换 | default 为 || 兼容写法
-    timeout-minutes: ${{ vars.ANALYSIS_TIMEOUT_MINUTES || 30 }}
+    timeout-minutes: ${{ vars.ANALYSIS_TIMEOUT_MINUTES || 130 }}
     
     steps:
       # 注释随机延迟，减少任务耗时
