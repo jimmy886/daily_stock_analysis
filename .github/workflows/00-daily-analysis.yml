@@ -1,11 +1,11 @@
 name: 每日股票分析
-# 新增权限
+# 全局权限，需要读写文件改为 write
 permissions:
   contents: read
 on:
   # 定时触发 - 每天北京时间 18:00 (UTC 10:00)
   schedule:
-    - cron: '0 8 * * 1-5'     # 周一到周五，UTC 10:00 = 北京时间 18:00
+    - cron: '0 10 * * 1-5'     # 周一到周五，UTC 10:00 = 北京时间 18:00
   
   # 手动触发
   workflow_dispatch:
@@ -25,27 +25,26 @@ on:
         default: false
         type: boolean
 
-# 并发控制：同一时间只运行一个分析任务
+# 并发控制：区分触发来源，定时/手动互不阻塞
 concurrency:
-  group: stock-analysis
+  group: stock-analysis-${{ github.event_name }}
   cancel-in-progress: false
 
 jobs:
   analyze:
     runs-on: ubuntu-latest
-    # 兼容误将 STOCK_LIST 配到同名 Environment variables 的场景；
-    # 推荐位置仍是 Settings -> Secrets and variables -> Actions -> Repository variables。
-    environment: STOCK_LIST
-    # 添加超时限制，防止任务卡死
-    timeout-minutes: ${{ fromJSON(vars.ANALYSIS_TIMEOUT_MINUTES || '30') }}
+    # 已删除非法 environment: STOCK_LIST 配置
+    # 修复超时语法
+    timeout-minutes: ${{ vars.ANALYSIS_TIMEOUT_MINUTES | default(30) }}
     
     steps:
-      - name: 随机延迟（避免固定时间访问）
-        run: sleep $((RANDOM % 60))  # 随机延迟0-60秒启动
+      # 注释随机延迟，减少任务耗时
+      # - name: 随机延迟（避免固定时间访问）
+      #   run: sleep $((RANDOM % 60))
       
       - name: 检出代码
         uses: actions/checkout@v5
-      
+     
       - name: 设置 Python 环境
         uses: actions/setup-python@v6
         with:
