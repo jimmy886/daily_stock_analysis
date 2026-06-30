@@ -33,8 +33,9 @@ concurrency:
 jobs:
   analyze:
     runs-on: ubuntu-latest
-    # 已删除非法 environment: STOCK_LIST 配置
-    # 修复语法报错，替换 | default 为 || 兼容写法
+    permissions:
+      contents: read      # checkout 需要
+      actions: read        # download artifact 可能需要
     timeout-minutes: ${{ vars.ANALYSIS_TIMEOUT_MINUTES || 130 }}
     
     steps:
